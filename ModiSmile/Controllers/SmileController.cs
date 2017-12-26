@@ -23,6 +23,10 @@ namespace ModiSmile.Controllers
         [HttpGet]
         public string Get([FromQuery] EventQuery value)
         {
+            if (value.UserIds!=null && value.UserIds.Length > 1)
+            {
+                value.UserIds = value.UserIds[0].Split(',');
+            }
             return _eventRepository.GetUserEvents(value.AggregateId, value.AggregateType, value.UserIds, value.ClientId, value.Action, value.From, value.To);
         }
 
@@ -32,7 +36,8 @@ namespace ModiSmile.Controllers
         {
             if (value == null)
                 return false;
-            value.AddDate = DateTime.Now;
+            if(!value.AddDate.HasValue)
+                value.AddDate = DateTime.Now;
             _eventRepository.Insert(value);
             return true;
         }

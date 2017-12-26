@@ -21,7 +21,7 @@ namespace ModiSmile.DataAccess.Repositories
             _connection.Insert(newEvent);
         }
 
-        public string GetUserEvents(int? aggregateId, string aggregateType, string[] userIds, string clientId, ActionTypes action, DateTime? from, DateTime? to)
+        public double? GetUserEvents(int? aggregateId, string aggregateType, string[] userIds, string clientId, ActionTypes action, DateTime? from, DateTime? to)
         {
             Aggregate aggregate;
             List<Event> events;
@@ -85,51 +85,17 @@ namespace ModiSmile.DataAccess.Repositories
             switch (action)
             {
                 case ActionTypes.Sum:
-                    if (aggregate.ValueType != AggregateValueTypes.Numeric)
-                    {
-                        return null;
-                    }
-                    return events.Sum(x => x.NumericValue).ToString();
+                    return events.Sum(x => x.Value);
                 case ActionTypes.Count:
-                    return events.Count().ToString();
+                    return events.Count();
                 case ActionTypes.Average:
-                    if (aggregate.ValueType != AggregateValueTypes.Numeric)
-                    {
-                        return null;
-                    }
-                    return events.Average(x => x.NumericValue).ToString();
+                    return events.Average(x => x.Value);
                 case ActionTypes.Duration:
-                    if(aggregate.ValueType!= AggregateValueTypes.DateTime)
-                    {
-                        return null;
-                    }
-                    return DateTime.Now.Subtract(events.First().DateValue.Value).TotalDays.ToString();
+                    return DateTime.Now.Subtract(events.First().AddDate.Value).TotalDays;
                 case ActionTypes.First:
-                    switch (aggregate.ValueType)
-                    {
-                        case AggregateValueTypes.Numeric:
-                            return events.Last().NumericValue.ToString();
-                        case AggregateValueTypes.String:
-                            return events.Last().StringValue;
-                        case AggregateValueTypes.DateTime:
-                            return events.Last().DateValue.ToString();
-                        default:
-                            break;
-                    }
-                    break;
+                    return events.Last().Value;
                 case ActionTypes.Last:
-                    switch (aggregate.ValueType)
-                    {
-                        case AggregateValueTypes.Numeric:
-                            return events.First().NumericValue.ToString();
-                        case AggregateValueTypes.String:
-                            return events.First().StringValue;
-                        case AggregateValueTypes.DateTime:
-                            return events.First().DateValue.ToString();
-                        default:
-                            break;
-                    }
-                    break;
+                    return events.First().Value;
                 default:
                     break;
             }
