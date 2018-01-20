@@ -10,18 +10,20 @@ using ModiSmile.Models;
 namespace ModiSmile.Controllers
 {
     [Route("api/[controller]")]
-    public class SmileController : Controller
+    public class EventController : Controller
     {
         private readonly IEventRepository _eventRepository;
+        private readonly IAggregateRepository _aggregateRepository;
 
-        public SmileController(IEventRepository eventRepository)
+        public EventController(IEventRepository eventRepository, IAggregateRepository aggregateRepository)
         {
             _eventRepository = eventRepository;
+            _aggregateRepository = aggregateRepository;
         }
 
         // GET api/values
         [HttpGet]
-        public string Get([FromQuery] EventQuery value)
+        public double? Get([FromQuery] EventQuery value)
         {
             if (value.UserIds!=null && value.UserIds.Length > 1)
             {
@@ -38,6 +40,14 @@ namespace ModiSmile.Controllers
                 return false;
             if(!value.AddDate.HasValue)
                 value.AddDate = DateTime.Now;
+            if (value.AggregateId == 0)
+            {
+                if (string.IsNullOrEmpty(value.AggregateType))
+                {
+                    return false;
+                }
+                value.AggregateId = _aggregateRepository.GetByTitle(value.AggregateType).Id;
+            }
             _eventRepository.Insert(value);
             return true;
         }

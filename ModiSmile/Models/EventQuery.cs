@@ -8,7 +8,6 @@ namespace ModiSmile.Models
 {
     public class EventQuery
     {
-        // int? aggregateId, string aggregateType,string[] userIds, ActionTypes action, DateTime? from, DateTime? to)
         public int AggregateId { get; set; }
         public string AggregateType { get; set; }
         public string[] UserIds { get; set; }

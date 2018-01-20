@@ -11,11 +11,8 @@ namespace ModiSmile.DataAccess.Entities
         public double Rate { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
-        public int ExpireUntilDaysAfter { get; set; }
+        public int? ExpiresDaysAfter { get; set; }
         public int Priority { get; set; }
-
-
-
 
     }
 }

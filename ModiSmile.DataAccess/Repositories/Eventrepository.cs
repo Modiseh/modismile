@@ -81,7 +81,10 @@ namespace ModiSmile.DataAccess.Repositories
             {
                 events = _connection.Query<Event>($"{baseQuery} ORDER BY [Id] DESC", new { AggregateId = aggregateId, UserIds = userIds, ClientIds = clientIds }).AsList();
             }
-
+            if(events == null || events.Count == 0)
+            {
+                return null;
+            }
             switch (action)
             {
                 case ActionTypes.Sum:
