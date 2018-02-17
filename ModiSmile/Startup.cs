@@ -30,7 +30,7 @@ namespace ModiSmile
 
             services.AddScoped<IDbConnection>(factory => new SqlConnection(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IEventRepository, EventRepository>();
-
+            services.AddScoped<IAggregateRepository, AggregateRepository>();
 
 
         }
