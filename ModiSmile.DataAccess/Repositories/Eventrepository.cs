@@ -37,7 +37,7 @@ namespace ModiSmile.DataAccess.Repositories
             }
 
 
-            if (clientIds != null && clientIds.Count() > 0)
+            if (clientIds.Any())
             {
                 List<string> allUserIds = new List<string>();
                 allUserIds.AddRange(clientIds);
@@ -45,7 +45,7 @@ namespace ModiSmile.DataAccess.Repositories
             }
 
             // get aggregate
-            if (aggregateId.HasValue)
+            if (aggregateId.HasValue && aggregateId != 0)
             {
                 aggregate = _connection.Get<Aggregate>(aggregateId);
                 baseQuery = "SELECT * FROM [Events] WHERE [AggregateId]=@AggregateId";
@@ -57,7 +57,7 @@ namespace ModiSmile.DataAccess.Repositories
             }
             else
             {
-                return null;
+                baseQuery = "SELECT * FROM [Events] WHERE 1=1";
             }
 
             baseQuery = $"{baseQuery} AND (([UserId] IN @UserIds) OR ([ClientId] IN @ClientIds))";
@@ -74,14 +74,14 @@ namespace ModiSmile.DataAccess.Repositories
             }
             else if (to.HasValue)
             {
-                events = _connection.Query<Event>($"{baseQuery} AND [AddDate]<=@T ORDER BY [Id] DESCo",
+                events = _connection.Query<Event>($"{baseQuery} AND [AddDate]<=@T ORDER BY [Id] DESC",
                     new { AggregateId = aggregateId, AggregateType = aggregateType, UserIds = userIds, ClientIds = clientIds, To = to }).AsList();
             }
             else
             {
                 events = _connection.Query<Event>($"{baseQuery} ORDER BY [Id] DESC", new { AggregateId = aggregateId, UserIds = userIds, ClientIds = clientIds }).AsList();
             }
-            if(events == null || events.Count == 0)
+            if (events == null || events.Count == 0)
             {
                 return null;
             }
@@ -104,6 +104,75 @@ namespace ModiSmile.DataAccess.Repositories
             }
             return null;
         }
+
+        public IEnumerable<Event> GetUserEventTransactions(int? aggregateId, string aggregateType, string[] userIds, string clientId, DateTime? from, DateTime? to)
+        {
+            Aggregate aggregate;
+            List<Event> events;
+            string baseQuery = "";
+            List<string> clientIds = _connection.Query<string>($"SELECT ClientId FROM [Events] WHERE [UserId] in @UserIds AND [ClientId] Is Not NULL", new { UserIds = userIds })?.ToList();
+            if (clientIds == null)
+            {
+                clientIds = new List<string>();
+            }
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                clientIds.Add(clientId);
+            }
+
+
+            if (clientIds.Any())
+            {
+                List<string> allUserIds = new List<string>();
+                allUserIds.AddRange(clientIds);
+                allUserIds.Add(clientId);
+            }
+
+            // get aggregate
+            if (aggregateId.HasValue && aggregateId != 0)
+            {
+                aggregate = _connection.Get<Aggregate>(aggregateId);
+                baseQuery = "SELECT * FROM [Events] WHERE [AggregateId]=@AggregateId";
+            }
+            else if (!string.IsNullOrEmpty(aggregateType))
+            {
+                aggregate = _connection.Query<Aggregate>("SELECT top 1 * FROM Aggregates WHERE Title=@title ORDER BY [Id] DESC", new { title = aggregateType }).First();
+                baseQuery = "SELECT * FROM [Events] WHERE [AggregateType]=@AggregateType";
+            }
+            else
+            {
+                baseQuery = "SELECT * FROM [Events] WHERE 1=1";
+            }
+
+            baseQuery = $"{baseQuery} AND (([UserId] IN @UserIds) OR ([ClientId] IN @ClientIds))";
+            // Query
+            if (from.HasValue && to.HasValue)
+            {
+                events = _connection.Query<Event>($"{baseQuery}  AND ([AddDate] BETWEEN @From and @To) ORDER BY [Id] DESC",
+                    new { AggregateId = aggregateId, AggregateType = aggregateType, UserIds = userIds, ClientIds = clientIds, From = from, To = to }).AsList();
+            }
+            else if (from.HasValue)
+            {
+                events = _connection.Query<Event>($"{baseQuery} AND [AddDate]>=@From ORDER BY [Id] DESC",
+                    new { AggregateId = aggregateId, AggregateType = aggregateType, UserIds = userIds, ClientIds = clientIds, From = from }).AsList();
+            }
+            else if (to.HasValue)
+            {
+                events = _connection.Query<Event>($"{baseQuery} AND [AddDate]<=@T ORDER BY [Id] DESC",
+                    new { AggregateId = aggregateId, AggregateType = aggregateType, UserIds = userIds, ClientIds = clientIds, To = to }).AsList();
+            }
+            else
+            {
+                events = _connection.Query<Event>($"{baseQuery} ORDER BY [Id] DESC", new { AggregateId = aggregateId, UserIds = userIds, ClientIds = clientIds }).AsList();
+            }
+            if (events == null || events.Count == 0)
+            {
+                return null;
+            }
+            
+            return events;
+        }
+
 
     }
 }
