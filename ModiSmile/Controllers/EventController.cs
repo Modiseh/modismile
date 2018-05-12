@@ -34,7 +34,7 @@ namespace ModiSmile.Controllers
 
         // POST api/values
         [HttpPost]
-        public bool Post([FromBody]Event value)
+        public bool Post([FromBody] Event value)
         {
             if (value == null)
                 return false;
