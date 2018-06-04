@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModiSmile.DataAccess.Repositories;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace ModiSmile
 {
@@ -32,6 +33,11 @@ namespace ModiSmile
             services.AddScoped<IEventRepository, EventRepository>();
             services.AddScoped<IAggregateRepository, AggregateRepository>();
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "ModiSmile API", Version = "V1" });
+            });
+
 
         }
 
@@ -44,6 +50,12 @@ namespace ModiSmile
             }
 
             app.UseMvc();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ModiSmile API V1");
+            });
         }
     }
 }
