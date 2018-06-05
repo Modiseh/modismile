@@ -27,6 +27,8 @@ namespace ModiSmile
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+
             services.AddMvc();
 
             services.AddScoped<IDbConnection>(factory => new SqlConnection(Configuration.GetConnectionString("DefaultConnection")));
@@ -47,6 +49,13 @@ namespace ModiSmile
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                //consider changing it for production environment
+                app.UseCors(builder => builder
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
             }
 
             app.UseMvc();
