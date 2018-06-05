@@ -3,7 +3,6 @@ import DateTimePicker from 'react-datetime-picker';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { addNewRuleAction } from '../actions/index';
-import currentRule from '../reducers/currentRule_Reducer';
 
 class RuleForm extends Component {
     constructor(props) {
@@ -16,13 +15,13 @@ class RuleForm extends Component {
                 rate: 1,
                 version: 1,
                 priority: 1,
-                expiresAfterDays: 0,
-                dateFrom: new Date(),
-                dateTo: new Date()
+                expiresDaysAfter: 0,
+                fromDate: new Date(),
+                toDate: new Date()
             }
         };
 
-        this.state.rule = this.props.currentRule;
+     
 
         this.onDateFromChange = this.onDateFromChange.bind(this);
         this.onDateToChange = this.onDateToChange.bind(this);
@@ -33,7 +32,7 @@ class RuleForm extends Component {
     onDateFromChange = function (date) {
         this.setState(prevState => ({
             rule: {
-                ...prevState.rule, dateFrom: date
+                ...prevState.rule, fromDate: date
             }
         }));
     }
@@ -41,7 +40,7 @@ class RuleForm extends Component {
     onDateToChange = function (date) {
         this.setState(prevState => ({
             rule: {
-                ...prevState.rule, dateTo: date
+                ...prevState.rule, toDate: date
             }
         }));
     }
@@ -54,11 +53,6 @@ class RuleForm extends Component {
         this.setState({ rule: { ...prevState, [event.target.id]: event.target.value } });
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.currentRule !== this.props.currentRule) {
-            this.setState({ rule: nextProps.currentRule });
-        }
-    }
 
     render() {
         return (
@@ -81,7 +75,7 @@ class RuleForm extends Component {
                 </div>
                 <div className="form-group col-md-3">
                     <label>Expires After Days</label>
-                    <input id="expiresAfterDays" value={this.state.rule.expiresAfterDays} onChange={this.onInputChange} className="form-control" />
+                    <input id="expiresDaysAfter" value={this.state.rule.expiresDaysAfter} onChange={this.onInputChange} className="form-control" />
                 </div>
                 <div className="form-group col-md-3">
                     <label>Priority</label>
@@ -90,14 +84,14 @@ class RuleForm extends Component {
                 <div className="form-group col-md-3">
                     <label>From Date</label>
                     <DateTimePicker
-                        value={this.state.rule.dateFrom}
+                        value={this.state.rule.fromDate}
                         onChange={this.onDateFromChange} className="form-control"
                     />
                 </div>
                 <div className="form-group col-md-3">
                     <label>To Date</label>
                     <DateTimePicker
-                        value={this.state.rule.dateTo}
+                        value={this.state.rule.toDate}
                         onChange={this.onDateToChange} className="form-control"
                     />
                 </div>
@@ -107,12 +101,9 @@ class RuleForm extends Component {
     }
 }
 
-function mapStateToProps(state) {
-    return { currentRule: state.currentRule }
-}
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({ saveRule: addNewRuleAction }, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RuleForm);
+export default connect(null, mapDispatchToProps)(RuleForm);
