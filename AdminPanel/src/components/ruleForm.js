@@ -21,38 +21,11 @@ class RuleForm extends Component {
             }
         };
 
-     
-
         this.onDateFromChange = this.onDateFromChange.bind(this);
         this.onDateToChange = this.onDateToChange.bind(this);
         this.onFormSubmit = this.onFormSubmit.bind(this);
         this.onInputChange = this.onInputChange.bind(this);
     }
-
-    onDateFromChange = function (date) {
-        this.setState(prevState => ({
-            rule: {
-                ...prevState.rule, fromDate: date
-            }
-        }));
-    }
-
-    onDateToChange = function (date) {
-        this.setState(prevState => ({
-            rule: {
-                ...prevState.rule, toDate: date
-            }
-        }));
-    }
-    onFormSubmit = function (event) {
-        event.preventDefault();
-        this.props.saveRule(this.state.rule)
-    }
-    onInputChange = function (event) {
-        let prevState = this.state.rule;
-        this.setState({ rule: { ...prevState, [event.target.id]: event.target.value } });
-    }
-
 
     render() {
         return (
@@ -99,6 +72,31 @@ class RuleForm extends Component {
             </form>
         )
     }
+
+    onDateFromChange = function (date) {
+        this.setState(prevState => ({
+            rule: {
+                ...prevState.rule, fromDate: date
+            }
+        }));
+    }
+
+    onDateToChange = function (date) {
+        this.setState(prevState => ({
+            rule: {
+                ...prevState.rule, toDate: date
+            }
+        }));
+    }
+    onFormSubmit = function (event) {
+        event.preventDefault();
+        this.props.saveRule(this.state.rule)
+    }
+    onInputChange = function (event) {
+        let prevState = this.state.rule;
+        this.setState({ rule: { ...prevState, [event.target.id]: event.target.value } });
+    }
+
 }
 
 
